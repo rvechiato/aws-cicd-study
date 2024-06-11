@@ -1,0 +1,38 @@
+name: Release Creation
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get current date and time
+        id: date
+        run: echo "RELEASE_VERSION=$(date +'%Y.%m.%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Create release branch
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout -b release/${{ env.RELEASE_VERSION }}
+          git push origin release/${{ env.RELEASE_VERSION }}
+
+      - name: Create Pull Request from release to main
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.PAT }}
+          base: main
+          branch: release/${{ env.RELEASE_VERSION }}
+          title: 'Release ${{ env.RELEASE_VERSION }}'
+          body: |
+            This pull request merges release ${{ env.RELEASE_VERSION }} to the main branch.
+          labels: |
+            release
+          draft: false

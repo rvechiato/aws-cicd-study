@@ -1,0 +1,29 @@
+
+name: Auto Create Pull Request
+
+on:
+  push:
+    branches:
+      - 'feature/*'
+      - 'bug/*'      
+
+jobs:
+  create-pull-request:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.PAT }}
+          base: develop
+          branch: ${{ github.ref }}
+          title: 'Automatic PR from ${{ github.ref }}'
+          body: |
+            This pull request is automatically created from branch ${{ github.ref }}.
+          labels: |
+            automatic-pr
+          draft: false
