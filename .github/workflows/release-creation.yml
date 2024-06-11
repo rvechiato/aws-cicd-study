@@ -27,7 +27,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
           git checkout develop
-          git checkout -b release/${{ env.RELEASE_VERSION }}
+          git checkout -b release/${{ env.RELEASE_VERSION }} develop
           git push origin release/${{ env.RELEASE_VERSION }}
 
       - name: Create Pull Request from release to main
