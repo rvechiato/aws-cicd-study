@@ -1,0 +1,52 @@
+name: Release Creation
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  create-release-branch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v2
+        with:
+          ref: develop
+
+      - name: Get current date and time
+        id: date
+        run: echo "RELEASE_VERSION=$(date +'%Y.%m.%d-%H%M%S')" >> $GITHUB_ENV
+
+      - name: Print release version
+        run: echo "Release version ${{ env.RELEASE_VERSION }}"
+
+      - name: Create release branch from develop
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout -b release/${{ env.RELEASE_VERSION }}
+          git push origin release/${{ env.RELEASE_VERSION }}
+
+      - name: Create Pull Request from release to main
+        id: create_pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.PAT }}
+          base: main
+          branch: release/${{ env.RELEASE_VERSION }}
+          title: 'Release ${{ env.RELEASE_VERSION }}'
+          body: |
+            This pull request merges release ${{ env.RELEASE_VERSION }} to the main branch.
+          labels: |
+            release
+          draft: false
+
+      - name: Print PR creation status
+        if: success()
+        run: echo "Pull request from release to main created successfully."
+
+      - name: Print PR creation failure
+        if: failure()
+        run: echo "Failed to create pull request from release to main."
