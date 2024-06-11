@@ -10,8 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout develop branch
         uses: actions/checkout@v2
+        with:
+          ref: develop
 
       - name: Get current date and time
         id: date
@@ -20,7 +22,7 @@ jobs:
       - name: Print release version
         run: echo "Release version ${{ env.RELEASE_VERSION }}"
 
-      - name: Create release branch
+      - name: Create release branch from develop
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
