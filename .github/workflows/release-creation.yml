@@ -20,14 +20,12 @@ jobs:
         run: echo "RELEASE_VERSION=$(date +'%Y.%m.%d-%H%M%S')" >> $GITHUB_ENV
 
       - name: Print release version
-        run: echo "Release version ${{ env.RELEASE_VERSION }}"
+        run: echo "Release version: ${{ env.RELEASE_VERSION }}"
 
       - name: Create release branch from develop
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git fetch origin develop:develop
-          git checkout develop
           git checkout -b release/${{ env.RELEASE_VERSION }}
           git push origin release/${{ env.RELEASE_VERSION }}
 
